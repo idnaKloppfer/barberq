@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="b65b2c95-1604-4def-bfcd-21db9e5f5a3d">
+	<property name="ireport.zoom" value="1.3310000000000006"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="932"/>
+	<subDataset name="hairCutTotalIncome" uuid="6adb0035-a1eb-469e-876d-c3a48b2fd18d">
+		<parameter name="year1" class="java.lang.String">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="month1" class="java.lang.String">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select count(h.style) as count,
+(h.style) as style,
+			h.price,
+			SUM(h.price) as sumaprice,
+			REPLACE(((sum(h.price) * sum(me.DISCOUNT)) / 100) - sum(h.price),"-"," ")  as priceTotal,
+			sum(me.DISCOUNT)as sumDiscount
+ from person as p join client as c on p.phone = c.phone
+	join meeting as me on c.id = me.CLIENT_ID
+	join haircut_type as h on me.HAIRCUT = h.id
+    join employee as emp on emp.ID=me.EMPLOYEE_SUPPORT
+where MONTH(me.DATE) = $P{month1} AND YEAR(me.DATE) = $P{year1}
+GROUP BY h.style
+order by DISCOUNT DESC]]>
+		</queryString>
+		<field name="count" class="java.lang.Long"/>
+		<field name="style" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="price" class="java.lang.Float">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="sumaprice" class="java.lang.Double"/>
+		<field name="priceTotal" class="java.lang.String"/>
+		<field name="sumDiscount" class="java.math.BigDecimal"/>
+		<group name="style">
+			<groupExpression><![CDATA[$F{style}]]></groupExpression>
+		</group>
+	</subDataset>
+	<subDataset name="countService" uuid="ecc3f343-ab3d-4b7f-90cd-9fa8d8794dae">
+		<parameter name="year2" class="java.lang.String">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="month2" class="java.lang.String">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select sum(service.PRICE),service.`NAME`,me.DISCOUNT,count(service.ID) as count
+ from person as p join client as c on p.phone = c.phone
+	join meeting as me on c.id = me.CLIENT_ID
+  join employee as emp on emp.ID=me.EMPLOYEE_SUPPORT
+	join meetserv as meetServ on meetserv.idm=me.ID
+	JOIN service as service on service.ID=meetserv.ids
+where MONTH(me.DATE) = $P{month2} AND YEAR(me.DATE) = $P{year2}
+order by DISCOUNT DESC]]>
+		</queryString>
+		<field name="sum(service.PRICE)" class="java.lang.Double"/>
+		<field name="NAME" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="DISCOUNT" class="java.lang.Integer">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="count" class="java.lang.Long"/>
+	</subDataset>
+	<subDataset name="serviceTotalIncome" uuid="14b5416a-a6ab-439c-af97-530ef1fbca19">
+		<parameter name="year3" class="java.lang.Integer">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="month3" class="java.lang.Integer">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select count(ser.name) as count,
+(ser.name) as service,
+			ser.price,
+			SUM(ser.price) as sumaprice,
+
+			REPLACE(((sum(ser.price) * sum(me.DISCOUNT)) / 100) - sum(ser.price),"-"," ")  as priceTotal,
+			sum(me.DISCOUNT)as sumDiscount
+ from person as p join client as c on p.phone = c.phone
+	join meeting as me on c.id = me.CLIENT_ID
+	join meetserv as ms on me.id = ms.idm
+	join service as ser on ms.ids= ser.id
+where MONTH(me.DATE) = $P{month3} AND YEAR(me.DATE) = $P{year3}
+
+GROUP BY ser.name
+order by DISCOUNT DESC]]>
+		</queryString>
+		<field name="count" class="java.lang.Long"/>
+		<field name="service" class="java.lang.String"/>
+		<field name="price" class="java.lang.Float">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="sumaprice" class="java.lang.Double"/>
+		<field name="priceTotal" class="java.lang.String"/>
+		<field name="sumDiscount" class="java.math.BigDecimal"/>
+	</subDataset>
+	<subDataset name="customersAttends" uuid="2252c137-cd45-4df6-a412-1daca3cf5f6f">
+		<parameter name="month10" class="java.lang.String">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="year10" class="java.lang.String">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select c.ID as id, sum(me.TOTALPRICE) as income,
+MONTHNAME(me.date) as mes, year(me.DATE) as YEAR,count(c.id) as count
+,CONCAT(p.name," " , p.last_name) as name,me.TOTALPRICE as TOTALPRICE
+ from person as p join client as c on p.phone = c.phone
+	join meeting as me on c.id = me.CLIENT_ID
+	join haircut_type as h on me.HAIRCUT = h.id
+	where MONTH(me.DATE) = $P{month10} AND YEAR(me.DATE) = $P{year10}
+GROUP BY c.ID]]>
+		</queryString>
+		<field name="id" class="java.lang.Long">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="income" class="java.lang.Double"/>
+		<field name="mes" class="java.lang.String"/>
+		<field name="YEAR" class="java.lang.Integer"/>
+		<field name="count" class="java.lang.Long"/>
+		<field name="name" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="TOTALPRICE" class="java.lang.Double">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<group name="id">
+			<groupExpression><![CDATA[$F{id}]]></groupExpression>
+		</group>
+	</subDataset>
+	<subDataset name="serviceDiscount" uuid="29487ead-8406-4d54-aeb9-10b068db745b">
+		<parameter name="month20" class="java.lang.String">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="year20" class="java.lang.String">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select count(ser.name) as count,
+(ser.name) as service,
+			sum(me.DISCOUNT)as sumDiscountSer
+ from person as p join client as c on p.phone = c.phone
+	join meeting as me on c.id = me.CLIENT_ID
+	join meetserv as ms on me.id = ms.idm
+	join service as ser on ms.ids= ser.id
+where MONTH(me.DATE) = $P{month20} AND YEAR(me.DATE) =  $P{year20}
+GROUP BY ser.name
+order by DISCOUNT DESC]]>
+		</queryString>
+		<field name="count" class="java.lang.Long"/>
+		<field name="service" class="java.lang.String"/>
+		<field name="sumDiscountSer" class="java.math.BigDecimal"/>
+	</subDataset>
+	<parameter name="month" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["E:\\Documentos\\PAGINA\\Israel\\reportes\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="year" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="logo" class="java.io.InputStream"/>
+	<queryString>
+		<![CDATA[select UPPER(h.style) as style, COUNT(c.id) as total, sum(me.TOTALPRICE) as income,
+MONTHNAME(me.date) as mes, year(me.DATE) as YEAR
+ from person as p join client as c on p.phone = c.phone
+	join meeting as me on c.id = me.CLIENT_ID
+	join haircut_type as h on me.HAIRCUT = h.id
+where MONTH(me.DATE) = $P{month} AND YEAR(me.DATE) = $P{year}
+GROUP BY h.style]]>
+	</queryString>
+	<field name="STYLE" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="TOTAL" class="java.lang.Long"/>
+	<field name="INCOME" class="java.lang.Double"/>
+	<field name="mes" class="java.lang.String"/>
+	<field name="year" class="java.lang.Integer"/>
+	<title>
+		<band height="111" splitType="Stretch">
+			<staticText>
+				<reportElement x="135" y="16" width="251" height="45" uuid="76468573-19a4-4898-b512-597ce785b37c"/>
+				<textElement textAlignment="Center">
+					<font size="30" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Monthly Report
+]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="273" y="83" width="59" height="20" uuid="fa5294d7-a464-4dc1-a038-81fde1df08e7"/>
+				<textFieldExpression><![CDATA[$F{mes}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="379" y="83" width="48" height="20" uuid="94142a8b-40e3-4762-833e-88e39fa1c4db"/>
+				<textElement>
+					<font fontName="Serif"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{year}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="23" y="83" width="246" height="20" uuid="c631abc7-fd63-4d6b-afaa-b80558660507"/>
+				<textElement>
+					<font fontName="Serif"/>
+				</textElement>
+				<text><![CDATA[The number of people and income that obtained in the month]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="328" y="83" width="45" height="20" uuid="e6c3813b-ab67-45ba-8d42-dd89a7c9bfc3"/>
+				<textElement>
+					<font fontName="Serif"/>
+				</textElement>
+				<text><![CDATA[of the year]]></text>
+			</staticText>
+			<image>
+				<reportElement x="392" y="0" width="163" height="73" uuid="3b44a067-220d-41e7-901d-eaae3077d8f0"/>
+				<imageExpression><![CDATA[$P{logo}]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="381">
+			<barChart>
+				<chart>
+					<reportElement x="2" y="20" width="555" height="142" uuid="f0c5b1ea-3fbe-439a-935b-a484c3700e90"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<categoryDataset>
+					<dataset>
+						<datasetRun subDataset="hairCutTotalIncome" uuid="87b543c8-e979-41fb-9993-19dfd366f53e">
+							<datasetParameter name="year1">
+								<datasetParameterExpression><![CDATA[$F{year}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="month1">
+								<datasetParameterExpression><![CDATA[$P{month}]]></datasetParameterExpression>
+							</datasetParameter>
+						</datasetRun>
+					</dataset>
+					<categorySeries>
+						<seriesExpression><![CDATA[$F{style}]]></seriesExpression>
+						<categoryExpression><![CDATA[$F{priceTotal}]]></categoryExpression>
+						<valueExpression><![CDATA[$F{count}]]></valueExpression>
+						<labelExpression><![CDATA[$F{priceTotal}+"₪"]]></labelExpression>
+					</categorySeries>
+				</categoryDataset>
+				<barPlot isShowLabels="true">
+					<plot/>
+					<itemLabel/>
+					<categoryAxisFormat>
+						<axisFormat/>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat/>
+					</valueAxisFormat>
+				</barPlot>
+			</barChart>
+			<staticText>
+				<reportElement x="2" y="0" width="544" height="20" uuid="c680f96a-b6cc-468f-8a1a-bfae3476a630"/>
+				<textElement>
+					<font fontName="Serif" size="14" isBold="true" isItalic="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Total income after discount by type of haircut and Number of people for each haircut service]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="4" y="166" width="542" height="31" uuid="e54786c7-468f-483c-885e-55485654091c"/>
+				<textElement>
+					<font fontName="Serif" size="14" isBold="true" isItalic="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Total income after discount by type of service and Number of services that provided at the barbershop]]></text>
+			</staticText>
+			<barChart>
+				<chart>
+					<reportElement x="2" y="197" width="555" height="165" uuid="23ecefde-f99b-4246-85dc-9bd815027741"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<categoryDataset>
+					<dataset>
+						<datasetRun subDataset="serviceTotalIncome" uuid="53d87de4-1849-400e-8ec0-5e3c07059868">
+							<datasetParameter name="year3">
+								<datasetParameterExpression><![CDATA[$P{year}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="month3">
+								<datasetParameterExpression><![CDATA[$P{month}]]></datasetParameterExpression>
+							</datasetParameter>
+						</datasetRun>
+					</dataset>
+					<categorySeries>
+						<seriesExpression><![CDATA[$F{service}]]></seriesExpression>
+						<categoryExpression><![CDATA[$F{sumaprice}]]></categoryExpression>
+						<valueExpression><![CDATA[$F{count}]]></valueExpression>
+						<labelExpression><![CDATA[$F{priceTotal}]]></labelExpression>
+					</categorySeries>
+				</categoryDataset>
+				<barPlot>
+					<plot/>
+					<itemLabel/>
+					<categoryAxisFormat>
+						<axisFormat/>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat/>
+					</valueAxisFormat>
+				</barPlot>
+			</barChart>
+		</band>
+	</pageHeader>
+	<summary>
+		<band height="614" splitType="Stretch">
+			<pieChart>
+				<chart>
+					<reportElement x="0" y="26" width="555" height="117" uuid="9da1081d-de0f-4954-b18c-22d8dc8528a3"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<pieDataset>
+					<dataset>
+						<datasetRun subDataset="hairCutTotalIncome" uuid="e8ee0aa8-4fd6-43b9-af5d-3b6db340fd62">
+							<datasetParameter name="month1">
+								<datasetParameterExpression><![CDATA[$P{month}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="year1">
+								<datasetParameterExpression><![CDATA[$P{year}]]></datasetParameterExpression>
+							</datasetParameter>
+						</datasetRun>
+					</dataset>
+					<keyExpression><![CDATA[$F{style}]]></keyExpression>
+					<valueExpression><![CDATA[$F{sumDiscount}]]></valueExpression>
+					<labelExpression><![CDATA[$F{sumDiscount}+"%"]]></labelExpression>
+				</pieDataset>
+				<piePlot>
+					<plot/>
+					<itemLabel/>
+				</piePlot>
+			</pieChart>
+			<staticText>
+				<reportElement x="0" y="6" width="555" height="20" uuid="ff35fef7-caba-4894-8648-cf903c46226d"/>
+				<textElement>
+					<font fontName="Serif" size="14" isBold="true" isItalic="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[The percentage of the discount given goes through the type of haircut]]></text>
+			</staticText>
+			<lineChart>
+				<chart>
+					<reportElement x="2" y="186" width="555" height="382" uuid="2c7db547-ec8e-4947-82a1-b9127e0582f2"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<categoryDataset>
+					<dataset>
+						<datasetRun subDataset="customersAttends" uuid="1ee4fd16-4291-4a73-864c-7a8c8325cb93">
+							<datasetParameter name="month10">
+								<datasetParameterExpression><![CDATA[$P{month}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="year10">
+								<datasetParameterExpression><![CDATA[$P{year}]]></datasetParameterExpression>
+							</datasetParameter>
+						</datasetRun>
+					</dataset>
+					<categorySeries>
+						<seriesExpression><![CDATA[$F{name}]]></seriesExpression>
+						<categoryExpression><![CDATA[$F{count}]]></categoryExpression>
+						<valueExpression><![CDATA[$F{TOTALPRICE}]]></valueExpression>
+						<labelExpression><![CDATA[$F{TOTALPRICE}+"₪"]]></labelExpression>
+						<itemHyperlink>
+							<hyperlinkTooltipExpression><![CDATA[$F{TOTALPRICE}+"₪"]]></hyperlinkTooltipExpression>
+						</itemHyperlink>
+					</categorySeries>
+				</categoryDataset>
+				<linePlot>
+					<plot/>
+					<categoryAxisFormat>
+						<axisFormat/>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat/>
+					</valueAxisFormat>
+				</linePlot>
+			</lineChart>
+			<staticText>
+				<reportElement x="2" y="147" width="350" height="39" uuid="efc9b5b1-9103-42a6-af8c-176d445cdad4"/>
+				<textElement>
+					<font fontName="Serif" size="14" isBold="true" isItalic="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[The number of haircuts and services that given per customer and the income that came from him]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

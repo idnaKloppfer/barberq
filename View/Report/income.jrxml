@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a8905ba0-4782-45d1-a7ca-f2d92f04e88a">
+	<property name="ireport.zoom" value="1.331000000000001"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="302"/>
+	<subDataset name="cut-count" uuid="3d10b33b-cb1e-4eb7-a990-bbf5749fcacf">
+		<parameter name="param1" class="java.lang.String">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select per.name, per.LAST_NAME, sum(m.totalprice), count(c.id) from meeting as m
+join haircut_type as c on m.HAIRCUT = c.ID
+join employee as emp on m.EMPLOYEE_SUPPORT = emp.ID
+join person as per on emp.PERSON_ID = per.ID
+  where DATE(m.date) = $P{param1} and m.completedwork = 1
+GROUP BY per.name]]>
+		</queryString>
+		<field name="name" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="LAST_NAME" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="sum(m.totalprice)" class="java.lang.Double"/>
+		<field name="count(c.id)" class="java.lang.Long"/>
+	</subDataset>
+	<parameter name="date" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="logoimg" class="java.io.InputStream"/>
+	<parameter name="dailytotal" class="java.io.InputStream"/>
+	<queryString>
+		<![CDATA[select MONTHNAME(me.date) as month, year(me.DATE) as year,
+				SUM(me.TOTALPRICE), me.date as date, TIME(me.date) as time, SUM(me.DISCOUNT) as discount,
+		day(me.DATE) as day, p.`NAME`,p.LAST_NAME,count(p.name) as count
+from meeting as me JOIN employee as emp on me.EMPLOYEE_SUPPORT=emp.ID
+join person as p on p.ID=emp.PERSON_ID
+where DATE(me.date) = $P{date} and me.completedwork = 1
+GROUP BY p.name
+]]>
+	</queryString>
+	<field name="month" class="java.lang.String"/>
+	<field name="year" class="java.lang.Integer"/>
+	<field name="SUM(me.TOTALPRICE)" class="java.lang.Double"/>
+	<field name="date" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="time" class="java.sql.Time"/>
+	<field name="discount" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="day" class="java.lang.Integer"/>
+	<field name="NAME" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="LAST_NAME" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="count" class="java.lang.Long"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="60" splitType="Stretch">
+			<staticText>
+				<reportElement x="147" y="6" width="260" height="48" uuid="abddfda1-c557-4f36-9dcd-7c043cab3296"/>
+				<textElement>
+					<font fontName="Serif" size="28" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Daily Income Report]]></text>
+			</staticText>
+			<image>
+				<reportElement x="0" y="0" width="147" height="60" uuid="610a190b-58d5-4d56-b3eb-b557058b358e"/>
+				<imageExpression><![CDATA[$P{logoimg}]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="46" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="15" width="137" height="20" uuid="4cceed39-33e9-4806-8e57-3db7cd1e352c"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Serif" size="12"/>
+				</textElement>
+				<text><![CDATA[Income obtained in the day]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="166" y="15" width="47" height="20" uuid="15477203-f048-40b3-8fe4-d698a607d94d"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Serif" size="12"/>
+				</textElement>
+				<text><![CDATA[of month]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="271" y="15" width="60" height="20" uuid="55a60ab4-01b0-48cc-83c1-4e3da649953c"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Serif" size="12"/>
+				</textElement>
+				<text><![CDATA[of the year]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="137" y="15" width="29" height="20" uuid="537ee6e5-2dae-4f55-ae7a-a984da8e85c7"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Serif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{day}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="213" y="15" width="68" height="20" uuid="b8ecdd55-0f24-4d9d-9027-70c357b098c3"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Serif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{month}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="341" y="15" width="50" height="20" uuid="25c347a4-9476-45f0-b9cc-ad9a82707ebf"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Serif" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{year}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<summary>
+		<band height="667" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="632" width="555" height="23" uuid="7a2830cd-a9be-4329-a86e-f11ee5f517e5"/>
+				<subreportParameter name="date1">
+					<subreportParameterExpression><![CDATA[$P{date}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{dailytotal}]]></subreportExpression>
+			</subreport>
+			<pieChart>
+				<chart>
+					<reportElement x="0" y="20" width="555" height="144" uuid="cd086d4b-d2e2-42af-8098-9bbf1c4351fb"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<pieDataset>
+					<keyExpression><![CDATA[$F{NAME}+" "+$F{LAST_NAME} ]]></keyExpression>
+					<valueExpression><![CDATA[$F{discount}]]></valueExpression>
+					<labelExpression><![CDATA[$F{discount}+"%"]]></labelExpression>
+				</pieDataset>
+				<piePlot>
+					<plot/>
+					<itemLabel/>
+				</piePlot>
+			</pieChart>
+			<staticText>
+				<reportElement x="0" y="0" width="434" height="20" uuid="be955969-1b6a-44d2-b882-468387b82c9e"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Serif" size="14" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[The amount of discount given by each employee]]></text>
+			</staticText>
+			<pieChart>
+				<chart>
+					<reportElement x="0" y="206" width="555" height="161" uuid="43ad1e5e-436f-440a-93ef-31853171596d"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<pieDataset>
+					<keyExpression><![CDATA[$F{NAME}+" "+$F{LAST_NAME}]]></keyExpression>
+					<valueExpression><![CDATA[$F{count}]]></valueExpression>
+					<labelExpression><![CDATA[$F{count}+""]]></labelExpression>
+				</pieDataset>
+				<piePlot>
+					<plot/>
+					<itemLabel/>
+				</piePlot>
+			</pieChart>
+			<pie3DChart>
+				<chart>
+					<reportElement x="0" y="417" width="555" height="178" uuid="044c1ad7-15b6-44b7-bd8d-4b28363472b3"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<pieDataset>
+					<keyExpression><![CDATA[$F{NAME}+" "+$F{LAST_NAME}]]></keyExpression>
+					<valueExpression><![CDATA[$F{SUM(me.TOTALPRICE)}]]></valueExpression>
+					<labelExpression><![CDATA[$F{SUM(me.TOTALPRICE)}+"₪"]]></labelExpression>
+				</pieDataset>
+				<pie3DPlot>
+					<plot/>
+					<itemLabel/>
+				</pie3DPlot>
+			</pie3DChart>
+			<staticText>
+				<reportElement x="0" y="175" width="434" height="20" uuid="34efe1a1-ad78-4759-98e2-fc8c56c125d1"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Serif" size="14" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[The amount of haircuts of each employee]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="384" width="434" height="20" uuid="83ef9461-d890-4e80-9851-7d4d562aca7a"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Serif" size="14" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[The amount of the employee's income]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>
